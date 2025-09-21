@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drag & Drop Frontend Builder</title>
+    
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+
+    <link rel="stylesheet" href="css/main.css">
+    
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                        accent: '#06b6d4'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen">
+    
+    <!-- Top Navigation Bar -->
+    <div class="fixed top-0 left-0 right-0 z-50 bg-white/10 backdrop-blur-lg border-b border-white/20">
+        <div class="flex items-center justify-between px-4 py-3">
+            <!-- Left Side -->
+            <div class="flex items-center space-x-3">
+                <button id="hamburger-menu" class="bg-white/20 backdrop-blur-lg text-white p-2 rounded-md hover:bg-white/30 transition-all duration-300">
+                    <i class="fas fa-bars text-sm"></i>
+                </button>
+                
+                <!-- Theme Toggle -->
+                <button id="theme-toggle" class="bg-white/20 backdrop-blur-lg text-white p-2 rounded-md hover:bg-white/30 transition-all duration-300" title="Toggle Theme">
+                    <i class="fas fa-moon text-sm"></i>
+                </button>
+                
+                <!-- Search Bar -->
+                <div class="relative">
+                    <input type="text" id="component-search" placeholder="Search components..." class="bg-white/10 border border-white/20 rounded-md px-3 py-2 text-white placeholder-gray-300 text-sm w-48 focus:outline-none focus:border-cyan-400">
+                    <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs"></i>
+                </div>
+            </div>
+            
+            <!-- Center - Project Info -->
+            <div class="flex items-center space-x-4">
+                <div class="text-white text-sm">
+                    <span class="text-gray-300">Project:</span>
+                    <span id="project-name" class="font-medium">Untitled Project</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button id="save-project" class="bg-green-500/20 text-green-300 px-3 py-1 rounded-md hover:bg-green-500/30 transition-all duration-300 text-xs">
+                        <i class="fas fa-save mr-1"></i>
+                        Save
+                    </button>
+                    <button id="load-project" class="bg-blue-500/20 text-blue-300 px-3 py-1 rounded-md hover:bg-blue-500/30 transition-all duration-300 text-xs">
+                        <i class="fas fa-folder-open mr-1"></i>
+                        Load
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Right Side -->
+            <div class="flex items-center space-x-3">
+                <!-- Keyboard Shortcuts -->
+                <button id="shortcuts-btn" class="bg-white/20 backdrop-blur-lg text-white p-2 rounded-md hover:bg-white/30 transition-all duration-300" title="Keyboard Shortcuts">
+                    <i class="fas fa-keyboard text-sm"></i>
+                </button>
+                
+                <!-- Settings -->
+                <button id="settings-btn" class="bg-white/20 backdrop-blur-lg text-white p-2 rounded-md hover:bg-white/30 transition-all duration-300" title="Settings">
+                    <i class="fas fa-cog text-sm"></i>
+                </button>
+                
+                <!-- Help -->
+                <button id="help-btn" class="bg-white/20 backdrop-blur-lg text-white p-2 rounded-md hover:bg-white/30 transition-all duration-300" title="Help">
+                    <i class="fas fa-question-circle text-sm"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 hidden">
+        <div class="absolute top-0 left-0 w-72 h-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 transform -translate-x-full transition-transform duration-300" id="mobile-menu">
+            <div class="p-4">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-white text-lg font-bold">Live Preview</h2>
+                    <button id="close-mobile-menu" class="text-white hover:text-gray-300">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+                
+                <!-- Live Preview Options -->
+                <div class="space-y-2">
+                    <button id="mobile-preview-desktop" class="w-full p-2 bg-blue-500/20 text-blue-300 rounded-md hover:bg-blue-500/30 transition-all duration-300 flex items-center text-sm">
+                        <i class="fas fa-desktop mr-2 text-xs"></i>
+                        Desktop
+                    </button>
+                    
+                    <button id="mobile-preview-tablet" class="w-full p-2 bg-green-500/20 text-green-300 rounded-md hover:bg-green-500/30 transition-all duration-300 flex items-center text-sm">
+                        <i class="fas fa-tablet-alt mr-2 text-xs"></i>
+                        Tablet
+                    </button>
+                    
+                    <button id="mobile-preview-mobile" class="w-full p-2 bg-purple-500/20 text-purple-300 rounded-md hover:bg-purple-500/30 transition-all duration-300 flex items-center text-sm">
+                        <i class="fas fa-mobile-alt mr-2 text-xs"></i>
+                        Mobile
+                    </button>
+                    
+                    <button id="mobile-fullscreen-preview" class="w-full p-2 bg-yellow-500/20 text-yellow-300 rounded-md hover:bg-yellow-500/30 transition-all duration-300 flex items-center text-sm">
+                        <i class="fas fa-expand mr-2 text-xs"></i>
+                        Fullscreen
+                    </button>
+                    
+                    <button id="mobile-generate-code" class="w-full p-2 bg-red-500/20 text-red-300 rounded-md hover:bg-red-500/30 transition-all duration-300 flex items-center text-sm">
+                        <i class="fas fa-code mr-2 text-xs"></i>
+                        Generate Code
+                    </button>
+                    
+                    <button id="mobile-test-preview" class="w-full p-2 bg-indigo-500/20 text-indigo-300 rounded-md hover:bg-indigo-500/30 transition-all duration-300 flex items-center text-sm">
+                        <i class="fas fa-flask mr-2 text-xs"></i>
+                        Test Preview
+                    </button>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="mt-4">
+                    <h3 class="text-white text-sm font-semibold mb-2">Quick Actions</h3>
+                    <div class="space-y-1">
+                        <button id="mobile-clear-canvas" class="w-full p-2 bg-gray-500/20 text-gray-300 rounded-md hover:bg-gray-500/30 transition-all duration-300 flex items-center text-xs">
+                            <i class="fas fa-trash mr-2 text-xs"></i>
+                            Clear Canvas
+                        </button>
+                        <button id="mobile-undo" class="w-full p-2 bg-gray-500/20 text-gray-300 rounded-md hover:bg-gray-500/30 transition-all duration-300 flex items-center text-xs">
+                            <i class="fas fa-undo mr-2 text-xs"></i>
+                            Undo
+                        </button>
+                        <button id="mobile-redo" class="w-full p-2 bg-gray-500/20 text-gray-300 rounded-md hover:bg-gray-500/30 transition-all duration-300 flex items-center text-xs">
+                            <i class="fas fa-redo mr-2 text-xs"></i>
+                            Redo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <svg class="absolute top-0 left-0 w-full h-full opacity-10" viewBox="0 0 1000 1000">
+            <defs>
+                <radialGradient id="grad1" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0" />
+                </radialGradient>
+            </defs>
+            <circle cx="200" cy="200" r="100" fill="url(#grad1)"/>
+            <circle cx="800" cy="300" r="150" fill="url(#grad1)"/>
+            <circle cx="400" cy="700" r="120" fill="url(#grad1)"/>
+        </svg>
+    </div>
+
+    
+    <div class="flex relative z-10 main-layout">
+        
+        
+        <div class="w-80 bg-white/10 backdrop-blur-lg border-r border-white/20 flex flex-col sidebar">
+            <!-- Header -->
+            <div class="p-6 border-b border-white/20">
+                <h1 class="text-2xl font-bold text-white mb-2">
+                    <i class="fas fa-magic text-purple-400 mr-2"></i>
+                    Frontend Builder
+                </h1>
+                <p class="text-gray-300 text-sm">Drag & drop components to build your page</p>
+            </div>
+
+            <!-- User Authentication Section -->
+            <div class="p-4 border-b border-white/20">
+                <h3 class="text-white font-semibold mb-3 flex items-center">
+                    <i class="fas fa-user text-cyan-400 mr-2"></i>
+                    Account
+                </h3>
+                <div class="space-y-2">
+                    <!-- Login Button -->
+                    <button id="login-btn" class="w-full p-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg hover:from-cyan-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 flex items-center justify-center">
+                        <i class="fas fa-sign-in-alt mr-2"></i>
+                        Login
+                    </button>
+                    
+                    <!-- Sign Up Button -->
+                    <button id="signup-btn" class="w-full p-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg hover:from-emerald-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105 flex items-center justify-center">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Sign Up
+                    </button>
+                    
+                    <!-- User Profile (Hidden by default) -->
+                    <div id="user-profile" class="hidden">
+                        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-3">
+                            <div class="flex items-center text-white mb-2">
+                                <i class="fas fa-user-circle text-cyan-400 mr-2"></i>
+                                <span class="font-medium" id="user-name">John Doe</span>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button id="profile-btn" class="flex-1 p-2 bg-blue-500/20 text-blue-300 rounded-md hover:bg-blue-500/30 transition-all duration-300 text-xs">
+                                    <i class="fas fa-cog mr-1"></i>
+                                    Profile
+                                </button>
+                                <button id="logout-btn" class="flex-1 p-2 bg-red-500/20 text-red-300 rounded-md hover:bg-red-500/30 transition-all duration-300 text-xs">
+                                    <i class="fas fa-sign-out-alt mr-1"></i>
+                                    Logout
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Templates Section -->
+            <div class="p-4 border-b border-white/20">
+                <h3 class="text-white font-semibold mb-3 flex items-center">
+                    <i class="fas fa-layer-group text-blue-400 mr-2"></i>
+                    Templates
+                </h3>
+                <div class="space-y-2">
+                    <button class="template-btn w-full p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105" data-template="login">
+                        <i class="fas fa-sign-in-alt mr-2"></i>
+                        Login Page
+                    </button>
+                    <button class="template-btn w-full p-3 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-lg hover:from-green-600 hover:to-teal-700 transition-all duration-300 transform hover:scale-105" data-template="blog">
+                        <i class="fas fa-blog mr-2"></i>
+                        Blog Page
+                    </button>
+                    <button class="template-btn w-full p-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-red-700 transition-all duration-300 transform hover:scale-105" data-template="ecommerce">
+                        <i class="fas fa-shopping-cart mr-2"></i>
+                        E-commerce Cart
+                    </button>
+                </div>
+            </div>
+
+            <!-- Components Section -->
+            <div class="flex-1 p-4 overflow-y-auto">
+                <h3 class="text-white font-semibold mb-4 flex items-center">
+                    <i class="fas fa-puzzle-piece text-green-400 mr-2"></i>
+                    Components
+                </h3>
+                <div class="space-y-4">
+                    <!-- Basic Components -->
+                    <div>
+                        <h4 class="text-white text-sm font-medium mb-2 text-gray-300">Basic Components</h4>
+                        <div class="space-y-2">
+                            <!-- Button Component -->
+                            <div class="component-item bg-white/10 backdrop-blur-sm rounded-lg p-3 cursor-grab hover:bg-white/20 transition-all duration-300" draggable="true" data-component="button">
+                                <div class="flex items-center text-white">
+                                    <i class="fas fa-square text-blue-400 mr-3"></i>
+                                    <span class="font-medium">Button</span>
+                                </div>
+                            </div>
+
+                            <!-- Input Component -->
+                            <div class="component-item bg-white/10 backdrop-blur-sm rounded-lg p-3 cursor-grab hover:bg-white/20 transition-all duration-300" draggable="true" data-component="input">
+                                <div class="flex items-center text-white">
+                                    <i class="fas fa-keyboard text-green-400 mr-3"></i>
+                                    <span class="font-medium">Input Field</span>
+                                </div>
+                            </div>
+
+                            <!-- Card Component -->
+                            <div class="component-item bg-white/10 backdrop-blur-sm rounded-lg p-3 cursor-grab hover:bg-white/20 transition-all duration-300" draggable="true" data-component="card">
+                                <div class="flex items-center text-white">
+                                    <i class="fas fa-id-card text-purple-400 mr-3"></i>
+                                    <span class="font-medium">Card</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Layout Components -->
+                    <div>
+                        <h4 class="text-white text-sm font-medium mb-2 text-gray-300">Layout Components</h4>
+                        <div class="space-y-2">
+                            <!-- Form Component -->
+                            <div class="component-item bg-white/10 backdrop-blur-sm rounded-lg p-3 cursor-grab hover:bg-white/20 transition-all duration-300" draggable="true" data-component="form">
+                                <div class="flex items-center text-white">
+                                    <i class="fas fa-wpforms text-yellow-400 mr-3"></i>
+                                    <span class="font-medium">Form</span>
+                                </div>
+                            </div>
+
+                            <!-- Navbar Component -->
+                            <div class="component-item bg-white/10 backdrop-blur-sm rounded-lg p-3 cursor-grab hover:bg-white/20 transition-all duration-300" draggable="true" data-component="navbar">
+                                <div class="flex items-center text-white">
+                                    <i class="fas fa-bars text-red-400 mr-3"></i>
+                                    <span class="font-medium">Navbar</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Media Components -->
+                    <div>
+                        <h4 class="text-white text-sm font-medium mb-2 text-gray-300">Media Components</h4>
+                        <div class="space-y-2">
+                            <!-- Image Component -->
+                            <div class="component-item bg-white/10 backdrop-blur-sm rounded-lg p-3 cursor-grab hover:bg-white/20 transition-all duration-300" draggable="true" data-component="image">
+                                <div class="flex items-center text-white">
+                                    <i class="fas fa-image text-pink-400 mr-3"></i>
+                                    <span class="font-medium">Image</span>
+                                </div>
+                            </div>
+
+                            <!-- Image Gallery Component -->
+                            <div class="component-item bg-white/10 backdrop-blur-sm rounded-lg p-3 cursor-grab hover:bg-white/20 transition-all duration-300" draggable="true" data-component="gallery">
+                                <div class="flex items-center text-white">
+                                    <i class="fas fa-images text-indigo-400 mr-3"></i>
+                                    <span class="font-medium">Image Gallery</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="p-4 border-t border-white/20">
+                <button id="show-code" class="w-full p-3 bg-blue-500/20 text-blue-300 rounded-lg hover:bg-blue-500/30 transition-all duration-300 mb-2">
+                    <i class="fas fa-code mr-2"></i>
+                    Show Generated Code
+                </button>
+                <button id="clear-canvas" class="w-full p-3 bg-red-500/20 text-red-300 rounded-lg hover:bg-red-500/30 transition-all duration-300 mb-2">
+                    <i class="fas fa-trash mr-2"></i>
+                    Clear Canvas
+                </button>
+                <button id="export-code" class="w-full p-3 bg-green-500/20 text-green-300 rounded-lg hover:bg-green-500/30 transition-all duration-300">
+                    <i class="fas fa-download mr-2"></i>
+                    Export Code
+                </button>
+                <button id="test-preview" class="w-full p-3 bg-yellow-500/20 text-yellow-300 rounded-lg hover:bg-yellow-500/30 transition-all duration-300 mt-2">
+                    <i class="fas fa-eye mr-2"></i>
+                    Test Preview
+                </button>
+            </div>
+        </div>
+
+        
+        <div class="flex-1 flex canvas-area">
+        
+            <div class="flex-1 p-6">
+                <div class="h-full bg-white/5 backdrop-blur-sm rounded-xl border border-white/20 relative overflow-hidden">
+                    <div class="absolute top-4 left-4 text-white/60 text-sm">
+                        <i class="fas fa-mouse-pointer mr-2"></i>
+                        Canvas - Drop components here
+                    </div>
+                    <div id="canvas" class="h-full p-8 min-h-full">
+                    
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Panel -->
+            <div class="w-80 bg-white/10 backdrop-blur-lg border-l border-white/20 flex flex-col preview-panel">
+                <div class="p-4 border-b border-white/20">
+                    <h3 class="text-white font-semibold flex items-center">
+                        <i class="fas fa-eye text-cyan-400 mr-2"></i>
+                        Live Preview
+                    </h3>
+                </div>
+                <div class="flex-1 p-4 overflow-y-auto">
+                    <div id="preview" class="bg-white rounded-lg shadow-lg min-h-full p-4">
+                        <!-- Live preview will be generated here -->
+                        <div class="text-center text-gray-500 py-8">
+                            <i class="fas fa-eye-slash text-4xl mb-4"></i>
+                            <p>Add components to see live preview</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Chat Panel -->
+            <div class="w-80 bg-white/10 backdrop-blur-lg border-l border-white/20 flex flex-col">
+                <div class="p-4 border-b border-white/20">
+                    <h3 class="text-white font-semibold flex items-center">
+                        <i class="fas fa-robot text-purple-400 mr-2"></i>
+                        AI Assistant
+                    </h3>
+                </div>
+                <div class="flex-1 flex flex-col">
+                    <!-- Chat Messages -->
+                    <div id="chat-messages" class="flex-1 p-3 overflow-y-auto space-y-3">
+                        <div class="ai-message bg-gradient-to-r from-purple-500 to-blue-500 text-white p-2 rounded-lg">
+                            <div class="flex items-start">
+                                <i class="fas fa-robot mr-2 mt-1 text-xs"></i>
+                                <div>
+                                    <p class="text-xs font-medium">AI Assistant</p>
+                                    <p class="text-xs">Hi! I can help you build components. Describe what you want!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Chat Input -->
+                    <div class="p-3 border-t border-white/20">
+                        <div class="flex space-x-1">
+                            <input 
+                                type="text" 
+                                id="chat-input" 
+                                placeholder="Describe what you want..."
+                                class="flex-1 bg-white/10 text-white placeholder-gray-300 border border-white/20 rounded px-2 py-1 text-xs focus:outline-none focus:border-purple-400"
+                            >
+                            <button 
+                                id="send-chat" 
+                                class="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-3 py-1 rounded hover:from-purple-600 hover:to-blue-600 transition-all duration-300 text-xs"
+                            >
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <div class="mt-2 flex flex-wrap gap-1">
+                            <button class="ai-suggestion bg-white/10 text-white text-xs px-2 py-1 rounded hover:bg-white/20 transition-all duration-300" data-prompt="Create a modern login form">
+                                Login
+                            </button>
+                            <button class="ai-suggestion bg-white/10 text-white text-xs px-2 py-1 rounded hover:bg-white/20 transition-all duration-300" data-prompt="Create a responsive navbar">
+                                Navbar
+                            </button>
+                            <button class="ai-suggestion bg-white/10 text-white text-xs px-2 py-1 rounded hover:bg-white/20 transition-all duration-300" data-prompt="Create a card component">
+                                Card
+                            </button>
+                        </div>
+                        <div class="mt-2 flex space-x-1">
+                            <button id="test-ai" class="flex-1 bg-green-500/20 text-green-300 text-xs px-2 py-1 rounded hover:bg-green-500/30 transition-all duration-300">
+                                <i class="fas fa-flask mr-1"></i> Test
+                            </button>
+                            <button id="debug-ai" class="flex-1 bg-yellow-500/20 text-yellow-300 text-xs px-2 py-1 rounded hover:bg-yellow-500/30 transition-all duration-300">
+                                <i class="fas fa-bug mr-1"></i> Debug
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white/10 backdrop-blur-lg rounded-xl border border-white/20 w-full max-w-md">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-white">Login</h2>
+                        <button id="close-login-modal" class="text-white hover:text-gray-300">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <form id="login-form" class="space-y-4">
+                        <div>
+                            <label class="block text-white text-sm font-medium mb-2">Email</label>
+                            <input type="email" id="login-email" class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:border-cyan-400" placeholder="Enter your email">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-white text-sm font-medium mb-2">Password</label>
+                            <input type="password" id="login-password" class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:border-cyan-400" placeholder="Enter your password">
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center text-white text-sm">
+                                <input type="checkbox" class="mr-2">
+                                Remember me
+                            </label>
+                            <a href="#" class="text-cyan-400 hover:text-cyan-300 text-sm">Forgot password?</a>
+                        </div>
+                        
+                        <button type="submit" class="w-full p-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg hover:from-cyan-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-sign-in-alt mr-2"></i>
+                            Login
+                        </button>
+                    </form>
+                    
+                    <div class="mt-4 text-center">
+                        <p class="text-gray-300 text-sm">Don't have an account? 
+                            <button id="switch-to-signup" class="text-cyan-400 hover:text-cyan-300 font-medium">Sign up</button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sign Up Modal -->
+    <div id="signup-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white/10 backdrop-blur-lg rounded-xl border border-white/20 w-full max-w-md">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-white">Sign Up</h2>
+                        <button id="close-signup-modal" class="text-white hover:text-gray-300">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <form id="signup-form" class="space-y-4">
+                        <div>
+                            <label class="block text-white text-sm font-medium mb-2">Full Name</label>
+                            <input type="text" id="signup-name" class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:border-emerald-400" placeholder="Enter your full name">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-white text-sm font-medium mb-2">Email</label>
+                            <input type="email" id="signup-email" class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:border-emerald-400" placeholder="Enter your email">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-white text-sm font-medium mb-2">Password</label>
+                            <input type="password" id="signup-password" class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:border-emerald-400" placeholder="Create a password">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-white text-sm font-medium mb-2">Confirm Password</label>
+                            <input type="password" id="signup-confirm-password" class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:border-emerald-400" placeholder="Confirm your password">
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <input type="checkbox" id="signup-terms" class="mr-2">
+                            <label for="signup-terms" class="text-white text-sm">
+                                I agree to the <a href="#" class="text-emerald-400 hover:text-emerald-300">Terms of Service</a> and <a href="#" class="text-emerald-400 hover:text-emerald-300">Privacy Policy</a>
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="w-full p-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg hover:from-emerald-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-user-plus mr-2"></i>
+                            Create Account
+                        </button>
+                    </form>
+                    
+                    <div class="mt-4 text-center">
+                        <p class="text-gray-300 text-sm">Already have an account? 
+                            <button id="switch-to-login" class="text-emerald-400 hover:text-emerald-300 font-medium">Login</button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Keyboard Shortcuts Modal -->
+    <div id="shortcuts-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white/10 backdrop-blur-lg rounded-xl border border-white/20 w-full max-w-2xl">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-white">Keyboard Shortcuts</h2>
+                        <button id="close-shortcuts-modal" class="text-white hover:text-gray-300">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="text-white font-semibold mb-3">General</h3>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between items-center text-gray-300">
+                                    <span>Save Project</span>
+                                    <kbd class="bg-white/20 px-2 py-1 rounded text-xs">Ctrl + S</kbd>
+                                </div>
+                                <div class="flex justify-between items-center text-gray-300">
+                                    <span>Load Project</span>
+                                    <kbd class="bg-white/20 px-2 py-1 rounded text-xs">Ctrl + O</kbd>
+                                </div>
+                                <div class="flex justify-between items-center text-gray-300">
+                                    <span>New Project</span>
+                                    <kbd class="bg-white/20 px-2 py-1 rounded text-xs">Ctrl + N</kbd>
+                                </div>
+                                <div class="flex justify-between items-center text-gray-300">
+                                    <span>Undo</span>
+                                    <kbd class="bg-white/20 px-2 py-1 rounded text-xs">Ctrl + Z</kbd>
+                                </div>
+                                <div class="flex justify-between items-center text-gray-300">
+                                    <span>Redo</span>
+                                    <kbd class="bg-white/20 px-2 py-1 rounded text-xs">Ctrl + Y</kbd>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-white font-semibold mb-3">Canvas</h3>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between items-center text-gray-300">
+                                    <span>Clear Canvas</span>
+                                    <kbd class="bg-white/20 px-2 py-1 rounded text-xs">Ctrl + D</kbd>
+                                </div>
+                                <div class="flex justify-between items-center text-gray-300">
+                                    <span>Select All</span>
+                                    <kbd class="bg-white/20 px-2 py-1 rounded text-xs">Ctrl + A</kbd>
+                                </div>
+                                <div class="flex justify-between items-center text-gray-300">
+                                    <span>Delete Selected</span>
+                                    <kbd class="bg-white/20 px-2 py-1 rounded text-xs">Delete</kbd>
+                                </div>
+                                <div class="flex justify-between items-center text-gray-300">
+                                    <span>Copy</span>
+                                    <kbd class="bg-white/20 px-2 py-1 rounded text-xs">Ctrl + C</kbd>
+                                </div>
+                                <div class="flex justify-between items-center text-gray-300">
+                                    <span>Paste</span>
+                                    <kbd class="bg-white/20 px-2 py-1 rounded text-xs">Ctrl + V</kbd>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white/10 backdrop-blur-lg rounded-xl border border-white/20 w-full max-w-md">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-white">Settings</h2>
+                        <button id="close-settings-modal" class="text-white hover:text-gray-300">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-white">Dark Mode</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="dark-mode-toggle" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-white">Auto-save</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="auto-save-toggle" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-white">Grid Snap</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="grid-snap-toggle" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-white text-sm font-medium mb-2">Grid Size</label>
+                            <input type="range" id="grid-size" min="10" max="50" value="20" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-xs text-gray-400 mt-1">
+                                <span>10px</span>
+                                <span>50px</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="help-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white/10 backdrop-blur-lg rounded-xl border border-white/20 w-full max-w-2xl">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-white">Help & Guide</h2>
+                        <button id="close-help-modal" class="text-white hover:text-gray-300">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="text-white font-semibold mb-3">Getting Started</h3>
+                            <div class="text-gray-300 text-sm space-y-2">
+                                <p>1. <strong>Drag Components:</strong> Drag components from the sidebar to the canvas</p>
+                                <p>2. <strong>Resize & Move:</strong> Click and drag to move, use corner handles to resize</p>
+                                <p>3. <strong>Live Preview:</strong> See your changes in real-time in the preview panel</p>
+                                <p>4. <strong>Generate Code:</strong> Click "Generate Code" to get HTML/CSS output</p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-white font-semibold mb-3">Features</h3>
+                            <div class="text-gray-300 text-sm space-y-2">
+                                <p>• <strong>Templates:</strong> Pre-built page layouts</p>
+                                <p>• <strong>AI Assistant:</strong> Generate components with AI</p>
+                                <p>• <strong>Responsive Preview:</strong> Test on different screen sizes</p>
+                                <p>• <strong>Export Options:</strong> Save as HTML, CSS, or images</p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-white font-semibold mb-3">Tips</h3>
+                            <div class="text-gray-300 text-sm space-y-2">
+                                <p>• Use keyboard shortcuts for faster workflow</p>
+                                <p>• Save your projects regularly</p>
+                                <p>• Try different templates to get started quickly</p>
+                                <p>• Use the AI assistant for complex components</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+
+    <script src="js/drag-drop.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/templates.js"></script>
+    <script src="js/preview.js"></script>
+    <script src="js/ai-chat.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
